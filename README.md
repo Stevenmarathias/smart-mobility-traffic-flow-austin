@@ -44,7 +44,7 @@ Key questions:
 2. **Temporal Congestion**  
    - When do speeds drop the most (AM vs PM peaks, weekday vs weekend)?
 
-3. **Origin–Destination Movement (Q7 & Q8)**  
+3. **Origin–Destination Movement**  
    - Q7: *What are the most common origins, destinations, and OD pairs?*  
    - Q8: *Which origin–destination routes are asymmetric (fast one way, slow the other)?*
 
@@ -160,7 +160,7 @@ These views feed all downstream charts and Tableau dashboards.
 - Speeds recover in late evening and on weekends, confirming **commuter-driven congestion**.
 - A handful of segments carry a disproportionate share of slow traffic and should be **priority candidates for signal retiming**.
 
-### 2. OD Traffic Is Concentrated on a Few Corridors (Q7)
+### 2. OD Traffic Is Concentrated on a Few Corridors
 
 Using top-origin, top-destination, and top-OD-pair charts:
 
@@ -168,7 +168,7 @@ Using top-origin, top-destination, and top-OD-pair charts:
 - These locations correspond to **major arterials and highway access points** in Austin.
 - High-volume OD pairs form the **backbone of daily movement**, suggesting where monitoring and investment matter most.
 
-### 3. Some OD Routes Are Directionally Asymmetric (Q8)
+### 3. Some OD Routes Are Directionally Asymmetric
 
 By comparing travel times in both directions:
 
