@@ -190,9 +190,8 @@ A Tableau dashboard / story (link to be added by the team) summarizes:
 - **Peak vs off-peak speed patterns**
 - **Segment- and OD-level hotspot maps**
 
-> Replace this line with your actual Tableau URL, e.g.:  
-> `Tableau Story Link: https://public.tableau.com/...`
-
+](https://public.tableau.com/app/profile/maggie.croghan/viz/Team4-FinalDashboard1/CongestionPatternsandSegmentPerformanceDashboard?publish=yes)
+https://public.tableau.com/app/profile/lihsin.chang/viz/dashboard2_17652280043810/Dashboard2
 ---
 
 ## Technologies Used
