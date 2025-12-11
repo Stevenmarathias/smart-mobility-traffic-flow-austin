@@ -103,7 +103,9 @@ Our ERD links five core entities:
 - **SEGMENT** (maps sensor pairs to real-world road segments and distances)  
 - **SUMMARY_INTERVAL** (aggregates segment performance over time windows)
 
-> The ERD image is included in the notebook and can also be added to the repo as `erd_smart_mobility.png`.
+#
+<img width="965" height="931" alt="Screenshot 2025-12-11 at 5 11 34 PM" src="https://github.com/user-attachments/assets/4e780f13-4bc4-4da3-8126-8d7072c5eab2" />
+
 
 ---
 
