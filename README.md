@@ -1,129 +1,232 @@
-# Smart Mobility & Traffic Flow Optimization in Austin  
-BA 815 – Final Team Project (Team A04)
-
-This repository contains my personal copy of our BA 815 team project on **smart mobility in Austin** using **IoT Bluetooth sensor data**.
-
-Team A04  
-Sambisha Godi • Li-Hsin Chang • Margaret Croghan • Steven Marathias • Tanish Puneeth  
+Smart-Mobility-and-Traffic-Flow-Optimization-in-Austin  
+TEAM A04 – Sambisha Godi, Li-Hsin Chang, Margaret Croghan, Steven Marathias, Tanish Puneeth
 
 ---
 
-## Project Overview
+## Overview
 
-The City of Austin deploys roadside Bluetooth sensors to anonymously detect devices and estimate travel times between key corridors. Our goal was to turn these detections into **actionable traffic insights**:
+This project analyzes **traffic flow in Austin, TX** using IoT **Bluetooth sensor data**.  
+By linking millions of roadside detections into origin–destination (OD) trips, we study when and where congestion appears, which corridors carry the most demand, and how travel times change by direction and time of day.
 
-- Build **origin–destination (OD) trips** and measure travel times between sensor pairs.  
-- Identify the **busiest origins, destinations, and OD pairs** across the network.  
-- Detect **peak-hour slowdowns** and **directional asymmetries** (fast one way, slow the other).  
-- Highlight **geographic hotspots** where congestion is concentrated.  
-- Provide **data-driven recommendations** for signal timing, corridor improvements, and future sensor placement.
+Using **Python, SQL-style transformations, and Tableau**, we:
 
-All heavy lifting (cleaning, feature engineering, analysis, and plots) lives in the Jupyter notebook in this repo.
+- Reconstruct trips between sensors
+- Measure segment travel times and speeds
+- Identify high-demand OD corridors
+- Detect peak-hour slowdowns and directional asymmetries
 
----
-
-## Data & ERD
-
-We worked from the sensor schema below (tables renamed slightly for clarity):
-
-- **SENSOR** – sensor id, location, road name, latitude/longitude, direction  
-- **DETECTION** – raw Bluetooth pings (device_id, sensor_id, timestamp, signal strength)  
-- **MATCHED_TRAVEL** – valid OD trips created by matching two detections from the same device, including start time, end time, and **travel_time_seconds**  
-- **SEGMENT** – road segments defined by origin and destination sensors plus **distance_miles**  
-- **SUMMARY_INTERVAL** – aggregated metrics for each segment and time window (average travel time, average speed, sample size, std. dev.)
-
-This design lets us go from low-level pings → trips → segments → time-of-day patterns and planning insights.
+The workflow includes data cleaning, schema design (ERD), trip construction, time-of-day aggregation, and visual analytics.
 
 ---
 
-## Key Questions
+## Motivation
 
-The analysis is structured around four main question groups:
+Cities invest heavily in roads and signal systems, but congestion patterns are often described anecdotally (“this road always backs up at 5 PM”).  
+Bluetooth sensors provide **continuous, high-resolution data** on how drivers actually move through the network.
 
-1. **Data Quality & Coverage**  
-   - Are detection volumes stable over time?  
-   - Do we have enough matched trips per segment to trust the speed estimates?
+Our goals:
 
-2. **Temporal Congestion Patterns**  
-   - When do **morning and evening peaks** occur?  
-   - How much slower is peak-hour travel compared to off-peak?
-
-3. **Origin–Destination (OD) Movement Insights**  
-   - Q7. **What are the most common origins, destinations, and OD pairs?**  
-   - Q8. **Which OD routes are asymmetric (fast one way, slow the other)?**
-
-4. **Segment-Level Planning Insights**  
-   - Which corridors show **chronic slow speeds**?  
-   - Where are **peak-hour slowdowns concentrated geographically**?
-
-Each question corresponds to a section in the notebook with dedicated code, charts, and text commentary.
+- Turn noisy sensor pings into **usable mobility insights**
+- Understand whether **peak-hour slowdowns** are localized or system-wide
+- Help planners answer: *Which corridors matter most, and when should we intervene?*
 
 ---
 
-## Highlights & Findings (Summary of Outputs)
+## Problem Definition
 
-This is a brief tour of what you will see when you open the notebook locally.
+We want to understand **how traffic flows through Austin’s Bluetooth sensor network** and where bottlenecks form.
 
-### 1. Data Quality & Volume
+Key questions:
 
-- Daily detection counts show **consistent activity** across most sensors, with a few obvious outliers that were excluded.  
-- After cleaning, we retain **tens of thousands of matched trips**, enough to compute stable average speeds for key segments.  
-- A small subset of segments has very low sample size; these are flagged and not used for strong conclusions.
+1. **Coverage & Reliability**  
+   - Do we have enough detections and matched trips to trust the patterns?
+
+2. **Temporal Congestion**  
+   - When do speeds drop the most (AM vs PM peaks, weekday vs weekend)?
+
+3. **Origin–Destination Movement (Q7 & Q8)**  
+   - Q7: *What are the most common origins, destinations, and OD pairs?*  
+   - Q8: *Which origin–destination routes are asymmetric (fast one way, slow the other)?*
+
+4. **Planning Insight**  
+   - Which specific segments or OD corridors should be **prioritized for signal retiming or capacity improvements**?
+
+---
+
+## Objectives
+
+We structure the analysis around four pillars:
+
+### 1. Network & Data Quality
+- Validate detection coverage across sensors
+- Filter out bad matches, missing IDs, and outlier travel times
+- Ensure we have enough samples per segment / OD pair
 
 ### 2. Temporal Congestion Patterns
-
-Using the `SUMMARY_INTERVAL` table, we:
-
-- Plot **average speed by hour of day**, broken out by weekday vs. weekend.  
-- Observe **clear AM and PM peaks** on weekdays, with speeds dropping noticeably during the commute windows.  
-- Weekends show flatter patterns, confirming that congestion is primarily a **commuter phenomenon** rather than constant all day.
+- Compare **hour-of-day** and **day-of-week** speed profiles
+- Quantify how much slower peak-hour travel is vs off-peak
+- Highlight segments with chronic, repeatable slowdowns
 
 ### 3. Origin–Destination Movement (Q7 & Q8)
+- Rank **top origins**, **top destinations**, and **top OD pairs** by volume  
+- Identify **directional asymmetry** where one direction is consistently slower
+- Connect OD patterns back to real-world corridors
 
-**Q7 – Most Common OD Locations & Pairs**
-
-- Bar charts of **Top Origins**, **Top Destinations**, and **Top OD Pairs** based on the number of matched trips.  
-- The busiest origins and destinations cluster along a few major north–south and east–west corridors, indicating **key commuter gateways** into and across the network.  
-- High-volume OD pairs form the **backbone of daily traffic**, and are natural priorities for any signal or capacity improvements.
-
-**Q8 – Asymmetric Route Performance**
-
-- For each OD pair with enough samples, we compare **travel times in both directions**.  
-- Some routes are **noticeably slower in one direction**, especially during peak hours (for example, inbound morning commute vs. outbound evening).  
-- These directional gaps suggest **uneven congestion, lane configuration differences, or signal timing that favors one direction**.  
-- Flagging these segments helps planners target **direction-specific fixes** rather than treating both sides of the road the same.
-
-### 4. Segment-Level Hotspots & Planning Ideas
-
-- Heatmaps and summary tables highlight segments that are **consistently slow**, not just at one point in time.  
-- We identify corridors that would benefit most from:
-  - **Signal retiming** or better coordination,  
-  - **Queue management** at key intersections,  
-  - Or **additional detection coverage** to improve monitoring.
-
-At the end of the notebook, we summarize **short-term recommendations** (signal optimization and monitoring) and **long-term ideas** (corridor redesign and better sensor placement).
+### 4. Segment-Level Planning Support
+- Flag “hotspot” segments for further engineering study
+- Provide a framework that can be reused as more sensors are added
 
 ---
 
-## Repository Contents
+## Data Sources
 
-- `A04-Smart-Mobility-and-Traffic-Flow-Optimization-in-Austin-Using-IoT-Bluetooth-Sensors.ipynb`  
-  - Full project notebook with **all outputs included** (EDA, charts, tables, and written insights).  
-- `README.md`  
-  - This document – high-level summary, key findings, and instructions.  
-- (Optional) `/figures/`  
-  - If exported, static copies of important plots used in the final report.  
-- (Optional) `/data/`  
-  - Sample or schema files (the full raw datasets are not included due to size and course restrictions).
+Primary data: **Austin Bluetooth Sensor Network**
+
+Tables (conceptually):
+
+- `DETECTION` – raw anonymized Bluetooth detections (device_id, sensor_id, timestamp, signal strength)
+- `SENSOR` – sensor locations, road names, and directions
+- `MATCHED_TRAVEL` – valid OD trips built by matching detections from the same device
+- `SEGMENT` – road segments defined by origin and destination sensors plus distance
+- `SUMMARY_INTERVAL` – time-bucketed averages (travel time, speed, sample size)
+
+The notebook works from a cleaned version of these tables (e.g., `itmf_cleaned_outliers`) after removing obvious errors and extreme outliers.
 
 ---
 
-## Tools & Techniques
+## ER Diagram
 
-- **Language:** Python (pandas, numpy, matplotlib, seaborn)  
-- **Environment:** Jupyter Notebook  
-- **Visualization:** matplotlib / seaborn, plus Tableau for interactive dashboards  
-- **Data Modeling:**  
-  - ERD for SENSOR / DETECTION / MATCHED_TRAVEL / SEGMENT / SUMMARY_INTERVAL  
-  - Trip construction from device-level detections  
-  - Aggregation to time-interval summaries for speed and travel-time analysis
+Our ERD links five core entities:
+
+- **SENSOR** ↔ **DETECTION** (each detection occurs at one sensor)  
+- **MATCHED_TRAVEL** (joins two detections into a trip: origin → destination)  
+- **SEGMENT** (maps sensor pairs to real-world road segments and distances)  
+- **SUMMARY_INTERVAL** (aggregates segment performance over time windows)
+
+> The ERD image is included in the notebook and can also be added to the repo as `erd_smart_mobility.png`.
+
+---
+
+## Data Cleaning Summary
+
+We applied several cleaning and standardization steps before analysis:
+
+### Detection / Matched Travel
+- Dropped rows with missing IDs (device_id, sensor_id, timestamps)
+- Removed trips with **negative or zero travel time**
+- Removed extreme outliers based on travel-time and speed thresholds
+
+### Segment / Summary Tables
+- Verified that each segment has valid origin and destination sensors
+- Computed **distance_miles** from GIS / provided metadata
+- Aggregated trips into **time intervals** (e.g., hourly) with:
+  - average travel time  
+  - average speed  
+  - sample size and standard deviation
+
+The result is a **clean, analysis-ready OD and segment-level dataset**.
+
+---
+
+## Key Analytical Views
+
+The notebook creates several intermediate “views” / tables to support analysis:
+
+- **Trip-Level Views**
+  - OD pairs with travel times and speeds
+  - Filters for minimum sample sizes per OD pair
+
+- **Temporal Views**
+  - Average speed by segment × hour-of-day × weekday/weekend
+  - Peak vs off-peak comparisons
+
+- **OD Summary Views (for Q7 & Q8)**
+  - `top_origins` – ranked by number of trips  
+  - `top_destinations` – ranked by number of trips  
+  - `top_od_pairs` – OD pairs with highest volumes  
+  - Directional performance comparison for each OD pair (A→B vs B→A)
+
+These views feed all downstream charts and Tableau dashboards.
+
+---
+
+## Major Findings
+
+### 1. Peak-Hour Slowdowns Are Clear and Recurrent
+
+- Weekday mornings and evenings show **sharp drops in average speed** on major corridors.
+- Speeds recover in late evening and on weekends, confirming **commuter-driven congestion**.
+- A handful of segments carry a disproportionate share of slow traffic and should be **priority candidates for signal retiming**.
+
+### 2. OD Traffic Is Concentrated on a Few Corridors (Q7)
+
+Using top-origin, top-destination, and top-OD-pair charts:
+
+- A small set of origins and destinations account for a **large share of total trips**.
+- These locations correspond to **major arterials and highway access points** in Austin.
+- High-volume OD pairs form the **backbone of daily movement**, suggesting where monitoring and investment matter most.
+
+### 3. Some OD Routes Are Directionally Asymmetric (Q8)
+
+By comparing travel times in both directions:
+
+- Several routes are **consistently slower in one direction**, especially in peak periods.
+- Likely drivers include:
+  - Uneven lane capacity  
+  - Signal timing that favors one direction  
+  - Heavier inbound vs outbound demand at specific times
+- These asymmetric corridors are **high-leverage opportunities** for direction-specific improvements (e.g., signal plans, turn lanes).
+
+---
+
+## Visualization Dashboard
+
+A Tableau dashboard / story (link to be added by the team) summarizes:
+
+- **Network overview and data coverage**
+- **Top origins, destinations, and OD pairs**
+- **Peak vs off-peak speed patterns**
+- **Segment- and OD-level hotspot maps**
+
+> Replace this line with your actual Tableau URL, e.g.:  
+> `Tableau Story Link: https://public.tableau.com/...`
+
+---
+
+## Technologies Used
+
+- **Python** (pandas, numpy, matplotlib / seaborn) for data wrangling and visualization  
+- **Jupyter Notebook** for analysis, documentation, and outputs  
+- **Tableau Public** for interactive dashboards  
+- **SQL-style transformations** (via pandas/BigQuery-style logic) for aggregations  
+- **ERD tools** (e.g., Lucidchart / draw.io) for schema design
+
+---
+
+## Limitations
+
+- Bluetooth detections are **opportunistic**: not every vehicle is captured, and detection rates may vary by location and time.
+- Some segments have **low sample sizes**; patterns there should be interpreted cautiously.
+- Travel times may be affected by **non-recurring events** (crashes, closures) that we do not explicitly model.
+- Sensor coverage does not include every road in Austin, so we focus on corridors where data is reliable.
+
+---
+
+## Future Improvements
+
+- Incorporate **additional data sources** (signal timing plans, incident logs, weather).  
+- Build **predictive models** to forecast travel times or congestion probabilities.  
+- Add **spatial visualizations** (map-based OD flows and hotspot maps).  
+- Automate the pipeline so new sensor data can be ingested and updated regularly.
+
+---
+
+## Conclusion
+
+This project demonstrates how **raw IoT sensor detections** can be transformed into **actionable mobility insights**:
+
+- We quantify **when** congestion happens, **where** it is concentrated, and **which OD routes are most critical**.
+- Planners can use these results to prioritize **signal tuning, corridor improvements, and sensor placement**.
+- The workflow is repeatable and can scale as Austin expands its Bluetooth sensor network.
+
+Overall, we turn high-volume detection data into a **practical decision-support tool** for smart mobility planning.
