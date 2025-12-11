@@ -25,3 +25,13 @@ We analyze Bluetooth detections from roadside sensors to:
 - SQL / ERD design for the sensor data model
 
 This repo is meant to document my individual work and final deliverables for the course.
+
+### How to view the notebook
+
+GitHub cannot render this notebook correctly and shows an **"Invalid Notebook"** message because of some rich-output/interactive cells.  
+To view the full analysis, please:
+
+1. Download the `.ipynb` file from this repository, and  
+2. Open it locally in Jupyter Notebook / JupyterLab / VS Code, or upload it to Google Colab.
+
+All code cells and outputs are intact in the file itself; this is only a GitHub display limitation.
