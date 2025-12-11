@@ -142,7 +142,7 @@ The notebook creates several intermediate “views” / tables to support analys
   - Average speed by segment × hour-of-day × weekday/weekend
   - Peak vs off-peak comparisons
 
-- **OD Summary Views (for Q7 & Q8)**
+- **OD Summary Views**
   - `top_origins` – ranked by number of trips  
   - `top_destinations` – ranked by number of trips  
   - `top_od_pairs` – OD pairs with highest volumes  
